@@ -1,2 +1,2 @@
-# Kumari-Bookshop-sliit-group-project-backend
+# Kumari Bookshop Rest API 
 Kumari Bokshop Management System Backend
