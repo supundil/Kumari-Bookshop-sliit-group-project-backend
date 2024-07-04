@@ -62,6 +62,8 @@ public class LoginServiceImpl extends UtilService implements LoginService {
             } else {
                 throw new BadRequestException("User credential can not be empty");
             }
+        } catch (ValidateException e) {
+            throw new ValidateException(e.getMessage());
         } catch (BadRequestException e) {
             throw new BadRequestException(e.getMessage());
         } catch (NotFoundException e) {
