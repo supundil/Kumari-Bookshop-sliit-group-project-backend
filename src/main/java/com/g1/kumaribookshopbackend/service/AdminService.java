@@ -1,11 +1,13 @@
 package com.g1.kumaribookshopbackend.service;
 
 import com.g1.kumaribookshopbackend.dto.AdminDto;
-import com.g1.kumaribookshopbackend.util.StandardResponse;
+import com.g1.kumaribookshopbackend.dto.RequestDto;
+
+import java.util.List;
 
 public interface AdminService {
 
-    StandardResponse saveAdmin(AdminDto adminDto);
+    RequestDto saveAdmin(AdminDto adminDto);
 
-    StandardResponse getAllAdmins();
+    List<AdminDto> getAllAdmins();
 }

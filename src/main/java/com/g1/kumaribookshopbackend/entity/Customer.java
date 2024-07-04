@@ -1,6 +1,7 @@
 package com.g1.kumaribookshopbackend.entity;
 
 import com.g1.kumaribookshopbackend.dto.CustomerDto;
+import com.g1.kumaribookshopbackend.enums.RecordStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,11 +19,7 @@ public class Customer extends SuperEntity<CustomerDto> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
     @Column
-    private String firstName;
-    @Column
-    private String lastName;
-    @Column
-    private String address;
+    private String name;
     @Column
     private String userName;
     @Column
@@ -30,7 +27,11 @@ public class Customer extends SuperEntity<CustomerDto> {
     @Column
     private String contactNo;
     @Column
+    private String nic;
+    @Column
     private String password;
+    @Enumerated(EnumType.STRING)
+    private RecordStatus recordStatus = RecordStatus.ACTIVE;
 
 //    @OneToMany(targetEntity = ProOrder.class, mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    private Set<ProOrder> proOrderList;
@@ -42,13 +43,11 @@ public class Customer extends SuperEntity<CustomerDto> {
     public CustomerDto toDto() {
         CustomerDto customerDto = new CustomerDto();
         customerDto.setCustomerId(this.customerId);
-        customerDto.setFirstName(this.firstName);
-        customerDto.setLastName(this.lastName);
-        customerDto.setAddress(this.address);
+        customerDto.setName(this.name);
+        customerDto.setNic(this.nic);
         customerDto.setEmailAddress(this.emailAddress);
         customerDto.setContactNo(this.contactNo);
         customerDto.setUserName(this.userName);
-        customerDto.setPassword(this.password);
         return customerDto;
     }
 }

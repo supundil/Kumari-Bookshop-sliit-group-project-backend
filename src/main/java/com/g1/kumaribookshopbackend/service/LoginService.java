@@ -1,11 +1,9 @@
 package com.g1.kumaribookshopbackend.service;
 
-import com.g1.kumaribookshopbackend.util.StandardResponse;
+import com.g1.kumaribookshopbackend.dto.RequestDto;
 
 public interface LoginService {
 
-    StandardResponse customerLogin(String userName, String password);
-
-    StandardResponse adminLogin(String userName, String password);
+    RequestDto userLogin(RequestDto requestDto);
 
 }

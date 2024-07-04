@@ -7,17 +7,18 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @MappedSuperclass
 public abstract class SuperDto<E extends SuperEntity> implements Serializable {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private ZonedDateTime createdDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private ZonedDateTime modifiedDate;
+    private LocalDateTime modifiedDate;
 
     public abstract E toEntity();
 }

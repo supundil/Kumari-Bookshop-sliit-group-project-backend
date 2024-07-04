@@ -8,9 +8,8 @@ import lombok.Data;
 @Data
 public class CustomerDto extends SuperDto<Customer> {
     private Long customerId;
-    private String firstName;
-    private String lastName;
-    private String address;
+    private String name;
+    private String nic;
     private String emailAddress;
     private String contactNo;
     private String userName;
@@ -24,13 +23,11 @@ public class CustomerDto extends SuperDto<Customer> {
     public Customer toEntity() {
         Customer customer = new Customer();
         customer.setCustomerId(this.customerId);
-        customer.setFirstName(this.firstName);
-        customer.setLastName(this.lastName);
-        customer.setAddress(this.address);
+        customer.setName(this.name);
+        customer.setNic(this.nic);
         customer.setEmailAddress(this.emailAddress);
         customer.setContactNo(this.contactNo);
         customer.setUserName(this.userName);
-        customer.setPassword(this.password);
         return customer;
     }
 }

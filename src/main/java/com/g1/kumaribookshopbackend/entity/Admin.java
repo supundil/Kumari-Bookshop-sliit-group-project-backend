@@ -1,6 +1,7 @@
 package com.g1.kumaribookshopbackend.entity;
 
 import com.g1.kumaribookshopbackend.dto.AdminDto;
+import com.g1.kumaribookshopbackend.enums.RecordStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,26 +20,29 @@ public class Admin extends SuperEntity<AdminDto> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long adminId;
     @Column
-    private String firstName;
+    private String name;
     @Column
-    private String lastName;
+    private String nic;
     @Column
     private String address;
     @Column
     private String userName;
     @Column
     private String password;
+    @Enumerated(EnumType.STRING)
+    private RecordStatus recordStatus = RecordStatus.ACTIVE;
 
 
     @Override
     public AdminDto toDto() {
         AdminDto adminDto = new AdminDto();
+        adminDto.setCreatedDate(this.getCreatedDate());
+        adminDto.setModifiedDate(this.getModifiedDate());
         adminDto.setAdminId(this.adminId);
-        adminDto.setFirstName(this.firstName);
-        adminDto.setLastName(this.lastName);
+        adminDto.setName(this.name);
+        adminDto.setNic(this.nic);
         adminDto.setAddress(this.address);
         adminDto.setUserName(this.userName);
-        adminDto.setPassword(this.password);
         return adminDto;
     }
 }

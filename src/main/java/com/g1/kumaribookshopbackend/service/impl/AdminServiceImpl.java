@@ -1,21 +1,23 @@
 package com.g1.kumaribookshopbackend.service.impl;
 
 import com.g1.kumaribookshopbackend.dto.AdminDto;
+import com.g1.kumaribookshopbackend.dto.RequestDto;
 import com.g1.kumaribookshopbackend.entity.Admin;
 import com.g1.kumaribookshopbackend.exception.AlreadyExistException;
+import com.g1.kumaribookshopbackend.exception.BadRequestException;
+import com.g1.kumaribookshopbackend.exception.InternalServerException;
 import com.g1.kumaribookshopbackend.repository.AdminRepository;
 import com.g1.kumaribookshopbackend.service.AdminService;
-import com.g1.kumaribookshopbackend.util.StandardResponse;
+import com.g1.kumaribookshopbackend.util.MessageConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @Slf4j
 public class AdminServiceImpl extends UtilService implements AdminService {
 
@@ -23,31 +25,47 @@ public class AdminServiceImpl extends UtilService implements AdminService {
     private AdminRepository adminRepository;
 
     @Override
-    public StandardResponse saveAdmin(AdminDto adminDto) {
+    public RequestDto saveAdmin(AdminDto adminDto) {
         try {
-            Boolean isExist = adminRepository.existsByUserName(adminDto.getUserName());
-            if (isExist){
-                throw new AlreadyExistException("User name already exist.");
+            RequestDto requestDto = new RequestDto();
+
+            if (Objects.nonNull(adminDto)) {
+
+                Boolean isExist = adminRepository.existsByUserName(adminDto.getUserName());
+                if (isExist){
+                    throw new AlreadyExistException(MessageConstant.USERNAME_ALREADY_EXIST);
+                }
+
+                Admin admin = adminDto.toEntity();
+                admin.setPassword(hidePassword(admin.getPassword()));
+                adminRepository.save(admin);
+
+                requestDto.setIsAdmin(true);
+                requestDto.setUsername(admin.getUserName());
+                requestDto.setToken(getUserTaken(adminDto.getUserName(),adminDto.getPassword()));
+
+            } else {
+                throw new BadRequestException("Request data can not be empty");
             }
-            Admin admin = adminDto.toEntity();
-            admin.setPassword(hidePassword(admin.getPassword()));
-            adminRepository.save(admin);
-            String userToken = getUserTaken(adminDto.getUserName(),adminDto.getPassword());
-            return new StandardResponse("200", "Successful", userToken, null);
+            return requestDto;
+
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (AlreadyExistException e) {
+            throw new AlreadyExistException(e.getMessage());
         } catch (Exception e) {
             log.error("Save admin failed : " + e.getMessage());
-            throw e;
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR) ;
         }
     }
 
     @Override
-    public StandardResponse getAllAdmins() {
+    public List<AdminDto> getAllAdmins() {
         try {
-            List<AdminDto> allAdmins = adminRepository.findAll().stream().map(Admin::toDto).collect(Collectors.toList());
-            return new StandardResponse("200", "Successful", allAdmins, null);
+            return adminRepository.findAll().stream().map(Admin::toDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Get all admins fetch failed : " + e.getMessage());
-            throw e;
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
 }

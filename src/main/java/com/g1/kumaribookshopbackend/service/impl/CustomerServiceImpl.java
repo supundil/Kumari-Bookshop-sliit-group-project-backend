@@ -1,72 +1,93 @@
 package com.g1.kumaribookshopbackend.service.impl;
 
 import com.g1.kumaribookshopbackend.dto.CustomerDto;
+import com.g1.kumaribookshopbackend.dto.RequestDto;
 import com.g1.kumaribookshopbackend.entity.Customer;
 import com.g1.kumaribookshopbackend.exception.AlreadyExistException;
+import com.g1.kumaribookshopbackend.exception.BadRequestException;
+import com.g1.kumaribookshopbackend.exception.InternalServerException;
 import com.g1.kumaribookshopbackend.exception.NotFoundException;
 import com.g1.kumaribookshopbackend.repository.CustomerRepository;
 import com.g1.kumaribookshopbackend.service.CustomerService;
-import com.g1.kumaribookshopbackend.util.StandardResponse;
+import com.g1.kumaribookshopbackend.util.MessageConstant;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-/**
- * @author Thathsara Dananjaya <thathsaradananjaya@gmail.com>
- * @since 1/16/2023
- **/
 
 @Service
-@Transactional
 @Slf4j
+@AllArgsConstructor
 public class CustomerServiceImpl extends UtilService implements CustomerService {
 
-    @Autowired
     private CustomerRepository customerRepository;
 
     @Override
-    public StandardResponse getCustomerByUserName(String username) {
+    public CustomerDto getCustomerByUserName(String username) {
         try {
-            Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
-                throw new NotFoundException("Username not found : " + username);
-            });
-            return new StandardResponse("200", "Successful", customer.toDto(), null);
+            if (Objects.nonNull(username)) {
+                Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
+                    throw new NotFoundException(MessageConstant.USER_NOT_FOUND);
+                });
+                return customer.toDto();
+            } else {
+                throw new BadRequestException("Request data can not be null");
+            }
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
         } catch (Exception e) {
             log.error("Get customer by username fetch failed : " + e.getMessage());
-            throw e;
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public StandardResponse getAllCustomers() {
+    public List<CustomerDto> getAllCustomers() {
     try {
-        List<CustomerDto> allCustomers = customerRepository.findAll().stream().map(Customer::toDto).collect(Collectors.toList());
-        return new StandardResponse("200", "Successful", allCustomers, null);
+        return customerRepository.findAll().stream().map(Customer::toDto).collect(Collectors.toList());
     } catch (Exception e) {
         log.error("Get all customers fetch failed : " + e.getMessage());
-        throw e;
+        throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
     }
     }
 
     @Override
-    public StandardResponse saveCustomer(CustomerDto customerDto) {
+    public RequestDto saveCustomer(CustomerDto customerDto) {
         try {
-            Boolean isExist = customerRepository.existsByUserName(customerDto.getUserName());
-            if (isExist){
-                throw new AlreadyExistException("User name already exist.");
+
+            if (Objects.nonNull(customerDto)) {
+                RequestDto requestDto = new RequestDto();
+
+                Boolean isExist = customerRepository.existsByUserName(customerDto.getUserName());
+                if (isExist){
+                    throw new AlreadyExistException(MessageConstant.USERNAME_ALREADY_EXIST);
+                }
+                Customer customer = customerDto.toEntity();
+                customer.setPassword(hidePassword(customerDto.getPassword()));
+                customerRepository.save(customer);
+
+                requestDto.setIsAdmin(false);
+                requestDto.setUsername(customerDto.getUserName());
+                requestDto.setToken(getUserTaken(customerDto.getUserName(),customerDto.getPassword()));
+                return requestDto;
+
+            } else {
+                throw new BadRequestException("Request data can not be null");
             }
-            Customer customer = customerDto.toEntity();
-            customer.setPassword(hidePassword(customerDto.getPassword()));
-            customerRepository.save(customer);
-            String userToken = getUserTaken(customerDto.getUserName(),customerDto.getPassword());
-            return new StandardResponse("200", "Successful", userToken, null);
-        }catch (Exception e) {
+
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (AlreadyExistException e) {
+            throw new AlreadyExistException(e.getMessage());
+        } catch (Exception e) {
             log.error("Save customer failed : " + e.getMessage());
-            throw e;
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
 

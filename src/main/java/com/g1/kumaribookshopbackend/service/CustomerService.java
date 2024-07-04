@@ -1,18 +1,18 @@
 package com.g1.kumaribookshopbackend.service;
 
 import com.g1.kumaribookshopbackend.dto.CustomerDto;
-import com.g1.kumaribookshopbackend.util.StandardResponse;
+import com.g1.kumaribookshopbackend.dto.RequestDto;
 
 import java.util.List;
 
 
 public interface CustomerService {
 
-    StandardResponse getCustomerByUserName(String username);
+    CustomerDto getCustomerByUserName(String username);
 
-    StandardResponse getAllCustomers();
+    List<CustomerDto> getAllCustomers();
 
-    StandardResponse saveCustomer(CustomerDto customerDto);
+    RequestDto saveCustomer(CustomerDto customerDto);
 
     List<CustomerDto> searchCustomersByUserName(String userName);
 
