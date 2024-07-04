@@ -3,9 +3,6 @@ package com.g1.kumaribookshopbackend.dto;
 import com.g1.kumaribookshopbackend.entity.Admin;
 import lombok.Data;
 
-
-
-
 @Data
 public class AdminDto extends SuperDto<Admin> {
     private Long adminId;
