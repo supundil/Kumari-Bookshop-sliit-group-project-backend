@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       max-lifetime: 580000
-    url: jdbc:mysql://localhost:3306/kumari-book-shop-db?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&characterSetResults=UTF-8&autoReconnect=true&createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/kumari_book_shop_db?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&characterSetResults=UTF-8&autoReconnect=true&createDatabaseIfNotExist=true
     username: root
     password: 1234
   main:
