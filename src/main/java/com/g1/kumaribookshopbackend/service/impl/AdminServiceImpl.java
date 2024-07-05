@@ -45,7 +45,7 @@ public class AdminServiceImpl extends UtilService implements AdminService {
                 requestDto.setToken(getUserTaken(adminDto.getUserName(),adminDto.getPassword()));
 
             } else {
-                throw new BadRequestException("Request data can not be empty");
+                throw new BadRequestException(MessageConstant.BAS_REQUEST);
             }
             return requestDto;
 
