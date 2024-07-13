@@ -78,8 +78,11 @@ public class ProductServiceImpl implements ProductService {
 
                 if (product.isPresent()) {
 
-                    DocumentDetailDto documentDetailDto = documentService.updateImage(file, product.get().getProductId());
-                    DocumentDetail documentDetail = documentDetailDto.toEntity();
+                    DocumentDetail documentDetail = product.get().getDocumentDetail();
+                    if (Objects.nonNull(file)) {
+                        DocumentDetailDto documentDetailDto = documentService.updateImage(file, product.get().getProductId());
+                        documentDetail = documentDetailDto.toEntity();
+                    }
 
                     Product save = productDto.toEntity();
                     save.setDocumentDetail(documentDetail);
