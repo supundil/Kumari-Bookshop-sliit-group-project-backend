@@ -3,6 +3,7 @@ package com.g1.kumaribookshopbackend.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g1.kumaribookshopbackend.dto.ListItemDto;
 import com.g1.kumaribookshopbackend.dto.ProductDto;
 import com.g1.kumaribookshopbackend.service.ProductService;
 import com.g1.kumaribookshopbackend.service.impl.UtilService;
@@ -74,6 +75,14 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getAllActiveProducts(@RequestHeader("Authorization") String token) {
         if (utilService.requestAuthentication(token,USER_ROLE)){
             return new ResponseEntity<>(productService.getAllActiveProducts(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/get-all-active-categories")
+    public ResponseEntity<List<ListItemDto>> getAllActiveProductCategories(@RequestHeader("Authorization") String token) {
+        if (utilService.requestAuthentication(token,ADMIN_ROLE)){
+            return new ResponseEntity<>(productService.getAllActiveProductCategories(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }

@@ -1,13 +1,16 @@
 package com.g1.kumaribookshopbackend.service.impl;
 
 import com.g1.kumaribookshopbackend.dto.DocumentDetailDto;
+import com.g1.kumaribookshopbackend.dto.ListItemDto;
 import com.g1.kumaribookshopbackend.dto.ProductDto;
 import com.g1.kumaribookshopbackend.entity.DocumentDetail;
 import com.g1.kumaribookshopbackend.entity.Product;
+import com.g1.kumaribookshopbackend.entity.ProductCategory;
 import com.g1.kumaribookshopbackend.enums.RecordStatus;
 import com.g1.kumaribookshopbackend.exception.BadRequestException;
 import com.g1.kumaribookshopbackend.exception.InternalServerException;
 import com.g1.kumaribookshopbackend.exception.NotFoundException;
+import com.g1.kumaribookshopbackend.repository.ProductCategoryRepository;
 import com.g1.kumaribookshopbackend.repository.ProductRepository;
 import com.g1.kumaribookshopbackend.service.DocumentService;
 import com.g1.kumaribookshopbackend.service.ProductService;
@@ -16,8 +19,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final DocumentService documentService;
+    private final ProductCategoryRepository productCategoryRepository;
 
 
     @Transactional
@@ -176,6 +182,25 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
             log.error("getAllProducts : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public List<ListItemDto> getAllActiveProductCategories() {
+        try {
+            List<ListItemDto> listItemDtos = new ArrayList<>();
+            List<ProductCategory> categories = productCategoryRepository.findAllByRecordStatus(RecordStatus.ACTIVE);
+            if (!CollectionUtils.isEmpty(categories)) {
+                listItemDtos.addAll(categories.stream().map(productCategory -> {
+                    return ListItemDto.builder().value(productCategory.getCategoryId()).label(productCategory.getName()).build();
+                }).toList());
+                return listItemDtos;
+            }
+            return listItemDtos;
+
+        } catch (Exception e) {
+            log.error("getAllActiveProductCategories : " + e.getMessage());
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }

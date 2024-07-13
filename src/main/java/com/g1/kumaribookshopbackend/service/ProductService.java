@@ -1,5 +1,6 @@
 package com.g1.kumaribookshopbackend.service;
 
+import com.g1.kumaribookshopbackend.dto.ListItemDto;
 import com.g1.kumaribookshopbackend.dto.ProductDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,4 +18,6 @@ public interface ProductService {
     ProductDto getProduct(Long productId);
 
     List<ProductDto> getAllActiveProducts();
+
+    List<ListItemDto> getAllActiveProductCategories();
 }
