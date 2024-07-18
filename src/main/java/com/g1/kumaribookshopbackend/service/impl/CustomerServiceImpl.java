@@ -35,7 +35,7 @@ public class CustomerServiceImpl extends UtilService implements CustomerService 
                 });
                 return customer.toDto();
             } else {
-                throw new BadRequestException("Request data can not be null");
+                throw new BadRequestException(MessageConstant.BAS_REQUEST);
             }
         } catch (BadRequestException e) {
             throw new BadRequestException(e.getMessage());
@@ -78,7 +78,7 @@ public class CustomerServiceImpl extends UtilService implements CustomerService 
                 return requestDto;
 
             } else {
-                throw new BadRequestException("Request data can not be null");
+                throw new BadRequestException(MessageConstant.BAS_REQUEST);
             }
 
         } catch (BadRequestException e) {
@@ -97,9 +97,8 @@ public class CustomerServiceImpl extends UtilService implements CustomerService 
             List<Customer> customers = customerRepository.searchCustomerByUserName(userName);
             return customers.stream().map(Customer::toDto).collect(Collectors.toList());
         } catch (Exception e) {
-            log.error("Search Customer By User Name Failed --> ");
-            e.printStackTrace();
-            throw e;
+            log.error("Search Customer By User Name Failed --> " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
 
