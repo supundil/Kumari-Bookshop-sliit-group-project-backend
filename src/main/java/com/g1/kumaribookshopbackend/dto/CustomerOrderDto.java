@@ -8,7 +8,7 @@ import lombok.Data;
 public class CustomerOrderDto extends SuperDto {
     private Long oderId;
     private OrderStatus orderStatus = OrderStatus.PENDING;
-    private Long customerId;
+    private String username;
     private Long productId;
     private Integer quantity;
 

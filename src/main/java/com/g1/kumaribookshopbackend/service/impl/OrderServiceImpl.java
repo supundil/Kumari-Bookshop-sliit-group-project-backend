@@ -37,36 +37,37 @@ public class OrderServiceImpl implements OrderService {
     public Boolean addToCart(CustomerOrderDto customerOrderDto) {
         try {
 
-            if (Objects.nonNull(customerOrderDto) && Objects.nonNull(customerOrderDto.getCustomerId()) && Objects.nonNull(customerOrderDto.getProductId())) {
+            if (Objects.nonNull(customerOrderDto) && Objects.nonNull(customerOrderDto.getUsername()) && Objects.nonNull(customerOrderDto.getProductId())) {
 
+                Customer customer = customerRepository.findByUserName(customerOrderDto.getUsername()).orElseThrow(() -> {
+                    throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+                });
 
-                Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatus(OrderStatus.PENDING);
+                Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PENDING, customer);
 
                 Product product = productRepository.findById(customerOrderDto.getProductId()).orElseThrow(() -> {
                     throw new InternalServerException(MessageConstant.PRODUCT_NOT_FOUND);
                 });
-                validateQuantity(product, customerOrderDto.getQuantity());
 
                 if (order.isPresent()) {
                     CustomerOrder customerOrder = order.get();
                     for (OrderDetail detail : customerOrder.getOrderDetailSet()) {
                         if (detail.getProduct().equals(product)) {
                             OrderDetail orderDetail = detail;
+                            validateQuantity(product, orderDetail.getProductQnt() + customerOrderDto.getQuantity());
                             orderDetail.setProductQnt(orderDetail.getProductQnt() + customerOrderDto.getQuantity());
                             orderDetail.setProductTotalPrice(product.getSellingPrice().multiply(BigDecimal.valueOf(orderDetail.getProductQnt())));
                             customerOrder.getOrderDetailSet().remove(detail);
                             customerOrder.getOrderDetailSet().add(orderDetail);
                             break;
                         } else {
+                            validateQuantity(product, customerOrderDto.getQuantity());
                             customerOrder.getOrderDetailSet().add(getOrderDetail(product, customerOrder, customerOrderDto.getQuantity()));
                             break;
                         }
                     }
                     customerOrderRepository.save(customerOrder);
                 } else {
-                    Customer customer = customerRepository.findById(customerOrderDto.getCustomerId()).orElseThrow(() -> {
-                        throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
-                    });
                     CustomerOrder customerOrder = CustomerOrder.builder()
                             .customer(customer)
                             .orderStatus(OrderStatus.PENDING)

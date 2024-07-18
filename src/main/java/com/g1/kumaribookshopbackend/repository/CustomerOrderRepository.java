@@ -1,5 +1,6 @@
 package com.g1.kumaribookshopbackend.repository;
 
+import com.g1.kumaribookshopbackend.entity.Customer;
 import com.g1.kumaribookshopbackend.entity.CustomerOrder;
 import com.g1.kumaribookshopbackend.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface CustomerOrderRepository extends JpaRepository<CustomerOrder,Long> {
-    Optional<CustomerOrder> findFirstByOrderStatus(OrderStatus orderStatus);
+    Optional<CustomerOrder> findFirstByOrderStatusAndCustomer(OrderStatus orderStatus, Customer customer);
 }
