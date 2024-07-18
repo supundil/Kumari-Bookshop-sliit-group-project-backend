@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 
 @Entity
 @AllArgsConstructor
@@ -33,11 +35,8 @@ public class Customer extends SuperEntity<CustomerDto> {
     @Enumerated(EnumType.STRING)
     private RecordStatus recordStatus = RecordStatus.ACTIVE;
 
-//    @OneToMany(targetEntity = ProOrder.class, mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private Set<ProOrder> proOrderList;
-//
-//    @OneToMany(targetEntity = Payment.class, mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private Set<Payment> paymentList;
+    @OneToMany(targetEntity = CustomerOrder.class, mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<CustomerOrder> customerOrderSet;
 
     @Override
     public CustomerDto toDto() {

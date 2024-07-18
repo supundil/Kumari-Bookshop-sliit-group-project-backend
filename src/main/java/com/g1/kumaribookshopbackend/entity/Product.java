@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -41,6 +42,9 @@ public class Product extends SuperEntity<ProductDto> {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "document_detail_id")
     private DocumentDetail documentDetail;
+
+    @OneToMany(targetEntity = OrderDetail.class, mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<OrderDetail> orderDetailSet;
 
     @Override
     public ProductDto toDto() {

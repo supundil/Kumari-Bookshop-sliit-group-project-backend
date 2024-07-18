@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Boolean> updateProduct(@RequestHeader("Authorization") String token,@RequestParam("file") MultipartFile file, @RequestParam("productDto") String productDtoData) throws JsonProcessingException {
+    public ResponseEntity<Boolean> updateProduct(@RequestHeader("Authorization") String token,@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("productDto") String productDtoData) throws JsonProcessingException {
         if (utilService.requestAuthentication(token,ADMIN_ROLE)) {
             ProductDto productDto = mapper.readValue(productDtoData, new TypeReference<ProductDto>() {});
             return new ResponseEntity<>(productService.updateProduct(productDto,file), HttpStatus.OK);
