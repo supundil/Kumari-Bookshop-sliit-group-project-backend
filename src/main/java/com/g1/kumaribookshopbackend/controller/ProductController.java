@@ -87,4 +87,12 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
+    @GetMapping("/get-detail/{productId}")
+    public ResponseEntity<ProductDto> getProductDetail(@RequestHeader("Authorization") String token,@PathVariable Long productId) {
+        if (utilService.requestAuthentication(token,USER_ROLE)){
+            return new ResponseEntity<>(productService.getProduct(productId), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
 }

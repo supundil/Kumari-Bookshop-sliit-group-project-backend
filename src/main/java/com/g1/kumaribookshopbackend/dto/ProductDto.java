@@ -17,6 +17,7 @@ public class ProductDto extends SuperDto<Product> {
     private BigDecimal sellingPrice;
     private Integer quantity;
     private Long categoryId;
+    private String categoryName;
     private String productImageName;
     private String imageBase64;
 
