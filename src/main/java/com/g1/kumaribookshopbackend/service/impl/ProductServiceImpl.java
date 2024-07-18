@@ -157,6 +157,7 @@ public class ProductServiceImpl implements ProductService {
                 if (product.isPresent()) {
                     ProductDto productDto = product.get().toDto();
                     productDto.setCategoryId(product.get().getProductCategory().getCategoryId());
+                    productDto.setCategoryName(product.get().getProductCategory().getName());
                     productDto.setProductImageName(product.get().getDocumentDetail().getFileName());
                     productDto.setImageBase64(documentService.getImage(product.get().getDocumentDetail().getFileId()));
                     return productDto;
