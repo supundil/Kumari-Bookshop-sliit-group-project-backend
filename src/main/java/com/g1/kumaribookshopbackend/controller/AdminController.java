@@ -1,5 +1,7 @@
 package com.g1.kumaribookshopbackend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g1.kumaribookshopbackend.dto.AdminDto;
 import com.g1.kumaribookshopbackend.dto.RequestDto;
 import com.g1.kumaribookshopbackend.service.AdminService;
@@ -32,7 +34,8 @@ public class AdminController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<RequestDto> saveAdmin(@RequestBody AdminDto adminDto) {
+    public ResponseEntity<RequestDto> saveAdmin(@RequestParam("adminDto") String adminDtoString) throws JsonProcessingException {
+            AdminDto adminDto = new ObjectMapper().readValue(adminDtoString, AdminDto.class);
             return new ResponseEntity<>(adminService.saveAdmin(adminDto), HttpStatus.OK);
     }
 }
