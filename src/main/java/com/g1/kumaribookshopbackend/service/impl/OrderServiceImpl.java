@@ -131,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
                     return customerOrderWrapperDto;
 
                 } else {
-                    return customerOrderWrapperDto;
+                    return null;
                 }
 
             } else {
