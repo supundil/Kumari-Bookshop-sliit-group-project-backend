@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @CrossOrigin
@@ -41,6 +43,11 @@ public class OrderController {
     @PostMapping("/place-order/{username}")
     public ResponseEntity<Boolean> placeOrder(@PathVariable String username) {
         return new ResponseEntity<>(orderService.placeOrder(username), HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-orders/{username}")
+    public ResponseEntity<List<CustomerOrderWrapperDto>> getAllOrders(@PathVariable String username) {
+        return new ResponseEntity<>(orderService.getAllOrders(username), HttpStatus.OK);
     }
 
 }

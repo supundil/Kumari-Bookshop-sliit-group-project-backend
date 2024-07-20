@@ -220,6 +220,58 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public List<CustomerOrderWrapperDto> getAllOrders(String username) {
+        try {
+            List<CustomerOrderWrapperDto> orderWrapperDtoList = new ArrayList<>();
+            CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
+            List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+            OrderDetailDto orderDetailDto = new OrderDetailDto();
+
+            if (Objects.nonNull(username)) {
+
+                Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
+                    throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+                });
+
+                List<CustomerOrder> allOrders = customerOrderRepository.findAllByCustomer(customer);
+                if (!CollectionUtils.isEmpty(allOrders)) {
+
+                    allOrders.forEach(customerOrder -> {
+
+                            CustomerOrder orderDetail = customerOrder;
+                            customerOrderWrapperDto.setOderId(orderDetail.getOderId());
+                            customerOrderWrapperDto.setUsername(username);
+                            customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
+                            customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
+                            customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+                            customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
+
+                            if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
+                                orderDetail.getOrderDetailSet().forEach(o -> {
+                                    orderDetailDtoList.add(o.toDto());
+                                });
+                            }
+                            customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
+                        orderWrapperDtoList.add(customerOrderWrapperDto);
+                    });
+
+                    return orderWrapperDtoList.stream().sorted(Comparator.comparing(CustomerOrderWrapperDto::getCreatedDate)).toList();
+                } else {
+                    return orderWrapperDtoList;
+                }
+
+
+            } else {
+                throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            log.error("getAllOrder failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private OrderDetail getOrderDetail(Product product, CustomerOrder customerOrder, Integer quantity) {
         return OrderDetail.builder()
                 .productQnt(quantity)
