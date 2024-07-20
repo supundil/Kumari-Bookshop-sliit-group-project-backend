@@ -38,6 +38,7 @@ public class OrderDetail extends SuperEntity<OrderDetailDto> {
         orderDetailDto.setQuantity(this.productQnt);
         orderDetailDto.setSellingPrice(this.product.getSellingPrice());
         orderDetailDto.setTotalPrice(this.productTotalPrice);
+        orderDetailDto.setImage(this.product.getDocumentDetail().getImage());
         return orderDetailDto;
     }
 }

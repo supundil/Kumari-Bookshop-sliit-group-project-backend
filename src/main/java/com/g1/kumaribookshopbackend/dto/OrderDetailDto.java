@@ -10,6 +10,7 @@ public class OrderDetailDto extends SuperDto<OrderDetail> {
     private Long productId;
     private String productName;
     private Integer quantity;
+    private String image;
     private BigDecimal sellingPrice;
     private BigDecimal totalPrice;
 
