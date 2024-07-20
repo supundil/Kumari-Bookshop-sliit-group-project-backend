@@ -11,6 +11,6 @@ public class CustomerOrderWrapperDto {
     private Long oderId;
     private OrderStatus orderStatus;
     private Integer productCount;
-    private BigDecimal totalCost = BigDecimal.valueOf(12500);
+    private BigDecimal totalCost;
     private List<OrderDetailDto> orderDetailDtoList;
 }

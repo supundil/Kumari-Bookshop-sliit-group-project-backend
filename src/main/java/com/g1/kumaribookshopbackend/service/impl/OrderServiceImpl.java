@@ -46,40 +46,43 @@ public class OrderServiceImpl implements OrderService {
                 });
 
                 Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PENDING, customer);
-
+                List<OrderDetail> orderDetails = new ArrayList<>();
                 Product product = productRepository.findById(customerOrderDto.getProductId()).orElseThrow(() -> {
                     throw new InternalServerException(MessageConstant.PRODUCT_NOT_FOUND);
                 });
 
+
                 if (order.isPresent()) {
-                    CustomerOrder customerOrder = order.get();
-                    for (OrderDetail detail : customerOrder.getOrderDetailSet()) {
-                        if (detail.getProduct().equals(product)) {
-                            OrderDetail orderDetail = detail;
-                            validateQuantity(product, orderDetail.getProductQnt() + customerOrderDto.getQuantity());
-                            orderDetail.setProductQnt(orderDetail.getProductQnt() + customerOrderDto.getQuantity());
-                            orderDetail.setProductTotalPrice(product.getSellingPrice().multiply(BigDecimal.valueOf(orderDetail.getProductQnt())));
-                            customerOrder.getOrderDetailSet().remove(detail);
-                            customerOrder.getOrderDetailSet().add(orderDetail);
-                            break;
-                        } else {
-                            validateQuantity(product, customerOrderDto.getQuantity());
-                            customerOrder.getOrderDetailSet().add(getOrderDetail(product, customerOrder, customerOrderDto.getQuantity()));
-                            break;
-                        }
+                    Optional<OrderDetail> orderDetail = orderDetailRepository.findByCustomerOrderAndProduct(order.get(), product);
+                    if (orderDetail.isPresent()) {
+                        OrderDetail save = orderDetail.get();
+                        validateQuantity(product, save.getProductQnt() + customerOrderDto.getQuantity());
+                        save.setProductQnt(save.getProductQnt() + customerOrderDto.getQuantity());
+                        save.setProductTotalPrice(product.getSellingPrice().multiply(BigDecimal.valueOf(save.getProductQnt())));
+                        OrderDetail save1 = orderDetailRepository.save(save);
+
+                    } else {
+                        validateQuantity(product, customerOrderDto.getQuantity());
+                        OrderDetail save = getOrderDetail(product, order.get(), customerOrderDto.getQuantity());
+                        orderDetailRepository.save(save);
                     }
-                    customerOrderRepository.save(customerOrder);
                 } else {
                     CustomerOrder customerOrder = CustomerOrder.builder()
                             .customer(customer)
+                            .totalCost(BigDecimal.ZERO)
                             .orderStatus(OrderStatus.PENDING)
                             .build();
                     CustomerOrder save = customerOrderRepository.save(customerOrder);
-                    orderDetailRepository.save(getOrderDetail(product, save, customerOrderDto.getQuantity()));
+                    OrderDetail save1 = orderDetailRepository.save(getOrderDetail(product, save, customerOrderDto.getQuantity()));
+                }
+                BigDecimal totalCost = product.getSellingPrice().multiply(BigDecimal.valueOf(customerOrderDto.getQuantity()));
+                Optional<CustomerOrder> updatedOrder = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PENDING, customer);
+                if (updatedOrder.isPresent()) {
+                    CustomerOrder customerOrder = updatedOrder.get();
+                    customerOrder.setTotalCost(customerOrder.getTotalCost().add(totalCost));
+                    customerOrderRepository.save(customerOrder);
                 }
                 return true;
-
-
             } else {
                 throw new BadRequestException(MessageConstant.BAS_REQUEST);
             }
@@ -112,12 +115,13 @@ public class OrderServiceImpl implements OrderService {
                     CustomerOrder orderDetail = order.get();
                     customerOrderWrapperDto.setOderId(orderDetail.getOderId());
                     customerOrderWrapperDto.setUsername(username);
+                    customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
                     customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
                     customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
 
                     if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
                         orderDetail.getOrderDetailSet().forEach(o -> {
-                           orderDetailDtoList.add(o.toDto());
+                            orderDetailDtoList.add(o.toDto());
                         });
                     }
 
@@ -145,8 +149,8 @@ public class OrderServiceImpl implements OrderService {
             Optional<OrderDetail> orderDetail = orderDetailRepository.findById(detailId);
             if (orderDetail.isPresent()) {
                 OrderDetail detail = orderDetail.get();
-                detail.setProductQnt(detail.getProductQnt()+1);
-                validateQuantity(detail.getProduct(),detail.getProductQnt());
+                detail.setProductQnt(detail.getProductQnt() + 1);
+                validateQuantity(detail.getProduct(), detail.getProductQnt());
                 orderDetailRepository.save(detail);
                 return true;
             } else {
@@ -168,7 +172,7 @@ public class OrderServiceImpl implements OrderService {
             Optional<OrderDetail> orderDetail = orderDetailRepository.findById(detailId);
             if (orderDetail.isPresent()) {
                 OrderDetail detail = orderDetail.get();
-                detail.setProductQnt(detail.getProductQnt()-1);
+                detail.setProductQnt(detail.getProductQnt() - 1);
                 orderDetailRepository.save(detail);
                 return true;
             } else {

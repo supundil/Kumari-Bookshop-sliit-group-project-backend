@@ -43,48 +43,24 @@ public class FirebaseServiceImpl {
 
 
     public Boolean deleteFile(String bucketName, String fileName) throws IOException {
-        // Load the credentials
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("kumari-book-shop-inventory-firebase-adminsdk-yod2u-e261c2a8ae.json"));
-
-        // Get the storage service
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-        // Create a BlobId
         BlobId blobId = BlobId.of(bucketName, fileName);
-
-        // Delete the file
-        boolean deleted = storage.delete(blobId);
-
-        // Check if the file was deleted
-        if (deleted) {
-            System.out.println("File deleted successfully");
-        } else {
-            System.out.println("File not found");
-        }
-        return deleted;
+        return storage.delete(blobId);
     }
 
 
     public DocumentDetailDto updateFile(String bucketName, String fileName, MultipartFile file) throws IOException {
-        // Load the credentials
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("kumari-book-shop-inventory-firebase-adminsdk-yod2u-e261c2a8ae.json"));
-
-        // Get the storage service
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-        // Create a BlobId
         BlobId blobId = BlobId.of(bucketName, fileName);
-
-        // Get the existing Blob
         Blob blob = storage.get(blobId);
 
-        // Check if the file exists
         if (blob == null) {
             System.out.println("File not found");
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
 
-        // Upload a new version of the file
         byte[] fileBytes = file.getBytes();
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(blob.getContentType()).build();
         storage.create(blobInfo, fileBytes);
@@ -106,11 +82,11 @@ public class FirebaseServiceImpl {
     public DocumentDetailDto upload(MultipartFile multipartFile) {
 
         try {
-            String fileName = multipartFile.getOriginalFilename();                        // to get original file name
-            fileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));  // to generated random string values for file name.
+            String fileName = multipartFile.getOriginalFilename();
+            fileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));
 
 
-            return this.uploadFile(multipartFile, fileName);                // Your customized response
+            return this.uploadFile(multipartFile, fileName);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
@@ -119,10 +95,9 @@ public class FirebaseServiceImpl {
     }
 
     public String download(String fileName) throws IOException {
-        String destFileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));     // to set random strinh for destination file name
-        String destFilePath = "D:\\New folder" + destFileName;                                    // to set destination file path
+        String destFileName = UUID.randomUUID().toString().concat(this.getExtension(fileName));
+        String destFilePath = "D:\\New folder" + destFileName;
 
-        ////////////////////////////////   Download  ////////////////////////////////////////////////////////////////////////
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("kumari-book-shop-inventory-firebase-adminsdk-yod2u-e261c2a8ae.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         Blob blob = storage.get(BlobId.of("kumari-book-shop-inventory.appspot.com", fileName));
