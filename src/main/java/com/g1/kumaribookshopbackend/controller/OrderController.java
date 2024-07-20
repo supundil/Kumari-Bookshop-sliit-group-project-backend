@@ -24,7 +24,7 @@ public class OrderController {
     }
 
     @GetMapping("/get-cart/{username}")
-    public ResponseEntity<CustomerOrderWrapperDto> addToCart(@PathVariable String username) {
+    public ResponseEntity<CustomerOrderWrapperDto> getCart(@PathVariable String username) {
         return new ResponseEntity<>(orderService.getCart(username), HttpStatus.OK);
     }
 
@@ -36,6 +36,11 @@ public class OrderController {
     @PostMapping("/decrease-product-quantity/{detailId}")
     public ResponseEntity<Boolean> decreaseProductQuantity(@PathVariable Long detailId) {
         return new ResponseEntity<>(orderService.decreaseProductQuantity(detailId), HttpStatus.OK);
+    }
+
+    @PostMapping("/place-order/{username}")
+    public ResponseEntity<Boolean> placeOrder(@PathVariable String username) {
+        return new ResponseEntity<>(orderService.placeOrder(username), HttpStatus.OK);
     }
 
 }

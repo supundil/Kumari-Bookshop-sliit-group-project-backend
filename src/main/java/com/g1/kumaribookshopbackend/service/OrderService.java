@@ -8,4 +8,5 @@ public interface OrderService {
     CustomerOrderWrapperDto getCart(String username);
     Boolean increaseProductQuantity(Long detailId);
     Boolean decreaseProductQuantity(Long detailId);
+    Boolean placeOrder(String username);
 }

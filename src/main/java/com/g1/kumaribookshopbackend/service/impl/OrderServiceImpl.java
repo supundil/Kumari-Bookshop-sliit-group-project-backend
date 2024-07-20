@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -118,6 +119,7 @@ public class OrderServiceImpl implements OrderService {
                     customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
                     customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
                     customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+                    customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
 
                     if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
                         orderDetail.getOrderDetailSet().forEach(o -> {
@@ -125,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
                         });
                     }
 
-                    customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList);
+                    customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
                     return customerOrderWrapperDto;
 
                 } else {
@@ -190,6 +192,31 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             log.error("increaseProductQuantity failed : ");
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean placeOrder(String username) {
+        try {
+
+            Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
+                throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+            });
+
+            Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PENDING, customer);
+            if (order.isPresent()) {
+                CustomerOrder customerOrder = order.get();
+                customerOrder.setOderPlacedDate(LocalDateTime.now());
+                customerOrder.setOrderStatus(OrderStatus.SUBMITTED);
+                customerOrderRepository.save(customerOrder);
+                return true;
+            } else {
+                throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+            }
+
+        } catch (Exception e) {
+           log.error("placeOrder failed : " + e.getMessage());
+           throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
 
