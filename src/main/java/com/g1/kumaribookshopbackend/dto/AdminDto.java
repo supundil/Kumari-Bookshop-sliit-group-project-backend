@@ -18,6 +18,7 @@ public class AdminDto extends SuperDto<Admin> {
         Admin admin = new Admin();
         admin.setAdminId(this.adminId);
         admin.setName(this.name);
+        admin.setNic(this.nic);
         admin.setAddress(this.address);
         admin.setUserName(this.userName);
         admin.setPassword(this.password);
