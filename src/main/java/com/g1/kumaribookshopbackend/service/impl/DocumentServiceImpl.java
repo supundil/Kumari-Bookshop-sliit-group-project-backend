@@ -21,14 +21,14 @@ import java.util.Objects;
 public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentDetailRepository documentDetailRepository;
-    private final GoogleDriveService googleDriveService;
+    private final FirebaseServiceImpl firebaseService;
 
 
     @Override
     public DocumentDetailDto uploadImage(MultipartFile file) {
         try {
 
-            return googleDriveService.uploadFile(file);
+            return firebaseService.upload(file);
 
         } catch (Exception e) {
             log.error("uploadImage failed : " + e.getMessage());
@@ -43,7 +43,7 @@ public class DocumentServiceImpl implements DocumentService {
             DocumentDetail documentDetail = documentDetailRepository.findById(docId).orElse(null);
 
             if (Objects.nonNull(documentDetail)) {
-                DocumentDetailDto updateFile = googleDriveService.updateFile(file,documentDetail.getFileId());
+                DocumentDetailDto updateFile = firebaseService.update(file,documentDetail.getFileId());
 
                 documentDetail.setFileId(updateFile.getFileId());
                 documentDetail.setFileName(updateFile.getFileName());
@@ -67,8 +67,8 @@ public class DocumentServiceImpl implements DocumentService {
 
             if (Objects.nonNull(fileId)) {
 
-                return googleDriveService.getFileContentAsBase64(fileId);
-
+//                return firebaseService.download(fileId);
+                return null;
             } else {
                 throw new BadRequestException(MessageConstant.BAS_REQUEST);
             }
@@ -87,7 +87,7 @@ public class DocumentServiceImpl implements DocumentService {
 
             if (Objects.nonNull(fileId)) {
 
-                return googleDriveService.deleteFile(fileId);
+                return firebaseService.delete(fileId);
 
             } else {
                 throw new BadRequestException(MessageConstant.BAS_REQUEST);

@@ -21,6 +21,8 @@ public class DocumentDetail extends SuperEntity<DocumentDetailDto> {
     private String fileId;
     @Column
     private String fileName;
+    @Column
+    private String image;
 
     @OneToOne(targetEntity = Product.class, mappedBy = "documentDetail" ,fetch = FetchType.LAZY)
     private Product product;
@@ -34,6 +36,7 @@ public class DocumentDetail extends SuperEntity<DocumentDetailDto> {
         documentDetailDto.setDocumentId(this.documentId);
         documentDetailDto.setFileId(this.getFileId());
         documentDetailDto.setFileName(this.fileName);
+        documentDetailDto.setFileBase64(image);
         return documentDetailDto;
     }
 }

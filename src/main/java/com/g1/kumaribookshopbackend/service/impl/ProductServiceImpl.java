@@ -159,7 +159,7 @@ public class ProductServiceImpl implements ProductService {
                     productDto.setCategoryId(product.get().getProductCategory().getCategoryId());
                     productDto.setCategoryName(product.get().getProductCategory().getName());
                     productDto.setProductImageName(product.get().getDocumentDetail().getFileName());
-                    productDto.setImageBase64(documentService.getImage(product.get().getDocumentDetail().getFileId()));
+                    productDto.setImageBase64(product.get().getDocumentDetail().getImage());
                     return productDto;
                 } else {
                     throw new NotFoundException(MessageConstant.PRODUCT_NOT_FOUND);
@@ -214,7 +214,7 @@ public class ProductServiceImpl implements ProductService {
     private ProductDto productCardDetails(Product product) {
         ProductDto productDto = product.toDto();
         productDto.setProductImageName(product.getDocumentDetail().getFileName());
-        productDto.setImageBase64(documentService.getImage(product.getDocumentDetail().getFileId()));
+        productDto.setImageBase64(product.getDocumentDetail().getImage());
         return productDto;
     }
 }
