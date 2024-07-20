@@ -151,7 +151,11 @@ public class OrderServiceImpl implements OrderService {
                 OrderDetail detail = orderDetail.get();
                 detail.setProductQnt(detail.getProductQnt() + 1);
                 validateQuantity(detail.getProduct(), detail.getProductQnt());
+                detail.setProductTotalPrice(detail.getProductTotalPrice().add(detail.getProduct().getSellingPrice()));
                 orderDetailRepository.save(detail);
+                CustomerOrder customerOrder = orderDetail.get().getCustomerOrder();
+                customerOrder.setTotalCost(customerOrder.getTotalCost().add(detail.getProduct().getSellingPrice()));
+                customerOrderRepository.save(customerOrder);
                 return true;
             } else {
                 throw new InternalServerException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
@@ -173,7 +177,11 @@ public class OrderServiceImpl implements OrderService {
             if (orderDetail.isPresent()) {
                 OrderDetail detail = orderDetail.get();
                 detail.setProductQnt(detail.getProductQnt() - 1);
+                detail.setProductTotalPrice(detail.getProductTotalPrice().add(detail.getProduct().getSellingPrice().negate()));
                 orderDetailRepository.save(detail);
+                CustomerOrder customerOrder = orderDetail.get().getCustomerOrder();
+                customerOrder.setTotalCost(customerOrder.getTotalCost().add(detail.getProduct().getSellingPrice().negate()));
+                customerOrderRepository.save(customerOrder);
                 return true;
             } else {
                 throw new InternalServerException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
