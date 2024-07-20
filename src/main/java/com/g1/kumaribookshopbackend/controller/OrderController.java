@@ -33,7 +33,7 @@ public class OrderController {
         return new ResponseEntity<>(orderService.increaseProductQuantity(detailId), HttpStatus.OK);
     }
 
-    @PostMapping("/decrease-product-quantity{detailId}")
+    @PostMapping("/decrease-product-quantity/{detailId}")
     public ResponseEntity<Boolean> decreaseProductQuantity(@PathVariable Long detailId) {
         return new ResponseEntity<>(orderService.decreaseProductQuantity(detailId), HttpStatus.OK);
     }
