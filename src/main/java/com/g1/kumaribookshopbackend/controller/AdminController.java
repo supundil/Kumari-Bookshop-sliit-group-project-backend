@@ -35,4 +35,9 @@ public class AdminController {
     public ResponseEntity<RequestDto> saveAdmin(@RequestBody AdminDto adminDto) {
             return new ResponseEntity<>(adminService.saveAdmin(adminDto), HttpStatus.OK);
     }
+
+    @PostMapping("/update-admin")
+    public ResponseEntity<Boolean> updateAdminDetails(@RequestBody AdminDto adminDto) {
+        return new ResponseEntity<>(adminService.updateAdminDetails(adminDto), HttpStatus.OK);
+    }
 }
