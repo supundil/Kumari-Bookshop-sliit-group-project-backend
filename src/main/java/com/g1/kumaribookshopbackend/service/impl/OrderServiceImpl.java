@@ -224,8 +224,7 @@ public class OrderServiceImpl implements OrderService {
     public List<CustomerOrderWrapperDto> getAllOrders(String username) {
         try {
             List<CustomerOrderWrapperDto> orderWrapperDtoList = new ArrayList<>();
-            CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
-            List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+
             OrderDetailDto orderDetailDto = new OrderDetailDto();
 
             if (Objects.nonNull(username)) {
@@ -237,7 +236,10 @@ public class OrderServiceImpl implements OrderService {
                 List<CustomerOrder> allOrders = customerOrderRepository.findAllByCustomer(customer);
                 if (!CollectionUtils.isEmpty(allOrders)) {
 
+
                     allOrders.forEach(customerOrder -> {
+                        CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
+                        List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
 
                             CustomerOrder orderDetail = customerOrder;
                             customerOrderWrapperDto.setOderId(orderDetail.getOderId());
@@ -251,12 +253,12 @@ public class OrderServiceImpl implements OrderService {
                                 orderDetail.getOrderDetailSet().forEach(o -> {
                                     orderDetailDtoList.add(o.toDto());
                                 });
+                                customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
                             }
-                            customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
                         orderWrapperDtoList.add(customerOrderWrapperDto);
                     });
 
-                    return orderWrapperDtoList.stream().sorted(Comparator.comparing(CustomerOrderWrapperDto::getCreatedDate)).toList();
+                    return orderWrapperDtoList.stream().sorted(Comparator.comparing(CustomerOrderWrapperDto::getCreatedDate).reversed()).toList();
                 } else {
                     return orderWrapperDtoList;
                 }
