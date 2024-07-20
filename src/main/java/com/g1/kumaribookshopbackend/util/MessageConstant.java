@@ -10,4 +10,5 @@ public class MessageConstant {
     public static final String USERNAME_ALREADY_EXIST = "User name already exist";
     public static final String BAS_REQUEST = "Request data can not be empty";
     public static final String INSUFFICIENT_QUANTITY = "Insufficient quantity";
+    public static final String ORDER_DETAIL_NOT_FOUND = "Order detail not found";
 }

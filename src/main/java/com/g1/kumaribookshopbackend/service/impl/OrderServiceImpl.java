@@ -1,6 +1,8 @@
 package com.g1.kumaribookshopbackend.service.impl;
 
 import com.g1.kumaribookshopbackend.dto.CustomerOrderDto;
+import com.g1.kumaribookshopbackend.dto.CustomerOrderWrapperDto;
+import com.g1.kumaribookshopbackend.dto.OrderDetailDto;
 import com.g1.kumaribookshopbackend.entity.Customer;
 import com.g1.kumaribookshopbackend.entity.CustomerOrder;
 import com.g1.kumaribookshopbackend.entity.OrderDetail;
@@ -18,10 +20,10 @@ import com.g1.kumaribookshopbackend.util.MessageConstant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -86,6 +88,95 @@ public class OrderServiceImpl implements OrderService {
             throw new ValidateException(e.getMessage());
         } catch (Exception e) {
             log.error("addToCart failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public CustomerOrderWrapperDto getCart(String username) {
+        try {
+
+            CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
+            List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+            OrderDetailDto orderDetailDto = new OrderDetailDto();
+
+            if (Objects.nonNull(username)) {
+
+                Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
+                    throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+                });
+
+                Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PENDING, customer);
+                if (order.isPresent()) {
+
+                    CustomerOrder orderDetail = order.get();
+                    customerOrderWrapperDto.setOderId(orderDetail.getOderId());
+                    customerOrderWrapperDto.setUsername(username);
+                    customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
+                    customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+
+                    if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
+                        orderDetail.getOrderDetailSet().forEach(o -> {
+                           orderDetailDtoList.add(o.toDto());
+                        });
+                    }
+
+                    customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList);
+                    return customerOrderWrapperDto;
+
+                } else {
+                    return customerOrderWrapperDto;
+                }
+
+            } else {
+                throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            log.error("getCart failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean increaseProductQuantity(Long detailId) {
+        try {
+
+            Optional<OrderDetail> orderDetail = orderDetailRepository.findById(detailId);
+            if (orderDetail.isPresent()) {
+                OrderDetail detail = orderDetail.get();
+                detail.setProductQnt(detail.getProductQnt()+1);
+                validateQuantity(detail.getProduct(),detail.getProductQnt());
+                orderDetailRepository.save(detail);
+                return true;
+            } else {
+                throw new InternalServerException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
+            }
+
+        } catch (ValidateException e) {
+            throw new ValidateException(e.getMessage());
+        } catch (Exception e) {
+            log.error("increaseProductQuantity failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean decreaseProductQuantity(Long detailId) {
+        try {
+
+            Optional<OrderDetail> orderDetail = orderDetailRepository.findById(detailId);
+            if (orderDetail.isPresent()) {
+                OrderDetail detail = orderDetail.get();
+                detail.setProductQnt(detail.getProductQnt()-1);
+                orderDetailRepository.save(detail);
+                return true;
+            } else {
+                throw new InternalServerException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            log.error("increaseProductQuantity failed : ");
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
