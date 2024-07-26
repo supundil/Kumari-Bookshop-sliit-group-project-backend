@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.webjars.NotFoundException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -215,8 +216,8 @@ public class OrderServiceImpl implements OrderService {
             }
 
         } catch (Exception e) {
-           log.error("placeOrder failed : " + e.getMessage());
-           throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+            log.error("placeOrder failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -241,20 +242,20 @@ public class OrderServiceImpl implements OrderService {
                         CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
                         List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
 
-                            CustomerOrder orderDetail = customerOrder;
-                            customerOrderWrapperDto.setOderId(orderDetail.getOderId());
-                            customerOrderWrapperDto.setUsername(username);
-                            customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
-                            customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
-                            customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
-                            customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
+                        CustomerOrder orderDetail = customerOrder;
+                        customerOrderWrapperDto.setOderId(orderDetail.getOderId());
+                        customerOrderWrapperDto.setUsername(username);
+                        customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
+                        customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
+                        customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+                        customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
 
-                            if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
-                                orderDetail.getOrderDetailSet().forEach(o -> {
-                                    orderDetailDtoList.add(o.toDto());
-                                });
-                                customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
-                            }
+                        if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
+                            orderDetail.getOrderDetailSet().forEach(o -> {
+                                orderDetailDtoList.add(o.toDto());
+                            });
+                            customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
+                        }
                         orderWrapperDtoList.add(customerOrderWrapperDto);
                     });
 
@@ -266,6 +267,150 @@ public class OrderServiceImpl implements OrderService {
 
             } else {
                 throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            log.error("getAllOrder failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CustomerOrderWrapperDto> getAllCustomerSubmittedOrders() {
+        try {
+            List<CustomerOrderWrapperDto> orderWrapperDtoList = new ArrayList<>();
+
+            OrderDetailDto orderDetailDto = new OrderDetailDto();
+
+
+            List<CustomerOrder> allOrders = customerOrderRepository.findAllByOrderStatus(OrderStatus.SUBMITTED);
+            if (!CollectionUtils.isEmpty(allOrders)) {
+
+
+                allOrders.forEach(customerOrder -> {
+                    CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
+                    List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+
+                    CustomerOrder orderDetail = customerOrder;
+                    customerOrderWrapperDto.setOderId(orderDetail.getOderId());
+                    customerOrderWrapperDto.setUsername(orderDetail.getCustomer().getName());
+                    customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
+                    customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
+                    customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+                    customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
+
+                    if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
+                        orderDetail.getOrderDetailSet().forEach(o -> {
+                            orderDetailDtoList.add(o.toDto());
+                        });
+                        customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
+                    }
+                    orderWrapperDtoList.add(customerOrderWrapperDto);
+                });
+
+                return orderWrapperDtoList.stream().sorted(Comparator.comparing(CustomerOrderWrapperDto::getCreatedDate).reversed()).toList();
+            } else {
+                return orderWrapperDtoList;
+            }
+
+
+        } catch (Exception e) {
+            log.error("getAllCustomerSubmittedOrders failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CustomerOrderWrapperDto> getAllConfirmedOrders() {
+        try {
+            List<CustomerOrderWrapperDto> orderWrapperDtoList = new ArrayList<>();
+
+            OrderDetailDto orderDetailDto = new OrderDetailDto();
+
+
+            List<CustomerOrder> allOrders = customerOrderRepository.findAllByOrderStatus(OrderStatus.CONFIRMED);
+            if (!CollectionUtils.isEmpty(allOrders)) {
+
+
+                allOrders.forEach(customerOrder -> {
+                    CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
+                    List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+
+                    CustomerOrder orderDetail = customerOrder;
+                    customerOrderWrapperDto.setOderId(orderDetail.getOderId());
+                    customerOrderWrapperDto.setUsername(orderDetail.getCustomer().getName());
+                    customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
+                    customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
+                    customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+                    customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
+
+                    if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
+                        orderDetail.getOrderDetailSet().forEach(o -> {
+                            orderDetailDtoList.add(o.toDto());
+                        });
+                        customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
+                    }
+                    orderWrapperDtoList.add(customerOrderWrapperDto);
+                });
+
+                return orderWrapperDtoList.stream().sorted(Comparator.comparing(CustomerOrderWrapperDto::getCreatedDate).reversed()).toList();
+            } else {
+                return orderWrapperDtoList;
+            }
+
+
+        } catch (Exception e) {
+            log.error("getAllConfirmedOrders failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean confirmCustomerOrder(Long orderId) {
+        try {
+
+            if (Objects.nonNull(orderId)) {
+
+                Optional<CustomerOrder> customerOrder = customerOrderRepository.findById(orderId);
+                if (customerOrder.isPresent()) {
+
+                    CustomerOrder order = customerOrder.get();
+                    order.setOrderStatus(OrderStatus.CONFIRMED);
+                    customerOrderRepository.save(order);
+                    return true;
+                } else {
+                    throw new NotFoundException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
+                }
+
+            } else {
+                throw new BadRequestException(MessageConstant.BAS_REQUEST);
+            }
+
+        } catch (Exception e) {
+            log.error("getAllOrder failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean closeCustomerOrder(Long orderId) {
+        try {
+
+            if (Objects.nonNull(orderId)) {
+
+                Optional<CustomerOrder> customerOrder = customerOrderRepository.findById(orderId);
+                if (customerOrder.isPresent()) {
+
+                    CustomerOrder order = customerOrder.get();
+                    order.setOrderStatus(OrderStatus.PAID);
+                    customerOrderRepository.save(order);
+                    return true;
+                } else {
+                    throw new NotFoundException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
+                }
+
+            } else {
+                throw new BadRequestException(MessageConstant.BAS_REQUEST);
             }
 
         } catch (Exception e) {

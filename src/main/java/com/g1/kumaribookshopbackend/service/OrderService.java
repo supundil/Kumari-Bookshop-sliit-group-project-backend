@@ -12,4 +12,8 @@ public interface OrderService {
     Boolean decreaseProductQuantity(Long detailId);
     Boolean placeOrder(String username);
     List<CustomerOrderWrapperDto> getAllOrders(String username);
+    List<CustomerOrderWrapperDto> getAllCustomerSubmittedOrders();
+    List<CustomerOrderWrapperDto> getAllConfirmedOrders();
+    Boolean confirmCustomerOrder(Long orderId);
+    Boolean closeCustomerOrder(Long orderId);
 }

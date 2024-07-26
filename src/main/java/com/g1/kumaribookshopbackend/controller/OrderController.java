@@ -50,4 +50,24 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getAllOrders(username), HttpStatus.OK);
     }
 
+    @GetMapping("/get-all-customer-submitted-orders")
+    public ResponseEntity<List<CustomerOrderWrapperDto>> getAllCustomerSubmittedOrders() {
+        return new ResponseEntity<>(orderService.getAllCustomerSubmittedOrders(), HttpStatus.OK);
+    }
+
+    @PostMapping("/confirm-customer-order/{orderId}")
+    public ResponseEntity<Boolean> confirmCustomerOrder(@PathVariable Long orderId) {
+        return new ResponseEntity<>(orderService.confirmCustomerOrder(orderId), HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-confirmed-orders")
+    public ResponseEntity<List<CustomerOrderWrapperDto>> getAllConfirmedOrders() {
+        return new ResponseEntity<>(orderService.getAllConfirmedOrders(), HttpStatus.OK);
+    }
+
+    @PostMapping("/close-customer-order/{orderId}")
+    public ResponseEntity<Boolean> closeCustomerOrder(@PathVariable Long orderId) {
+        return new ResponseEntity<>(orderService.closeCustomerOrder(orderId), HttpStatus.OK);
+    }
+
 }

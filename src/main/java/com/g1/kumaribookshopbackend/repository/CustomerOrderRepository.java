@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface CustomerOrderRepository extends JpaRepository<CustomerOrder,Long> {
     Optional<CustomerOrder> findFirstByOrderStatusAndCustomer(OrderStatus orderStatus, Customer customer);
     List<CustomerOrder> findAllByCustomer(Customer customer);
+    List<CustomerOrder> findAllByOrderStatus(OrderStatus orderStatus);
 }
