@@ -238,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
                 List<CustomerOrder> allOrders = customerOrderRepository.findAllByCustomer(customer);
                 if (!CollectionUtils.isEmpty(allOrders)) {
 
-                    allOrders = allOrders.stream().filter(customerOrder -> customerOrder.getOrderStatus().equals(OrderStatus.PENDING)).toList();
+                    allOrders = allOrders.stream().filter(customerOrder -> !customerOrder.getOrderStatus().equals(OrderStatus.PENDING)).toList();
 
                     allOrders.forEach(customerOrder -> {
                         CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
