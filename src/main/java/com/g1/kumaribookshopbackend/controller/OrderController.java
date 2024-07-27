@@ -80,8 +80,8 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getAllRejectedOrders(), HttpStatus.OK);
     }
 
-    @PostMapping("/close-customer-order/{orderId}")
-    public ResponseEntity<Boolean> closeCustomerOrder(@PathVariable Long orderId) {
+    @PostMapping("/paid-customer-order/{orderId}")
+    public ResponseEntity<Boolean> paidCustomerOrder(@PathVariable Long orderId) {
         return new ResponseEntity<>(orderService.closeCustomerOrder(orderId), HttpStatus.OK);
     }
 
