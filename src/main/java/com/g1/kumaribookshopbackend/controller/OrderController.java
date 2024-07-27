@@ -75,6 +75,10 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getAllPaidOrders(), HttpStatus.OK);
     }
 
+    @GetMapping("/get-all-rejected-orders")
+    public ResponseEntity<List<CustomerOrderWrapperDto>> getAllRejectedOrders() {
+        return new ResponseEntity<>(orderService.getAllRejectedOrders(), HttpStatus.OK);
+    }
 
     @PostMapping("/close-customer-order/{orderId}")
     public ResponseEntity<Boolean> closeCustomerOrder(@PathVariable Long orderId) {

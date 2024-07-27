@@ -407,7 +407,52 @@ public class OrderServiceImpl implements OrderService {
 
 
         } catch (Exception e) {
-            log.error("getAllConfirmedOrders failed : " + e.getMessage());
+            log.error("getAllPaidOrders failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CustomerOrderWrapperDto> getAllRejectedOrders() {
+        try {
+            List<CustomerOrderWrapperDto> orderWrapperDtoList = new ArrayList<>();
+
+            OrderDetailDto orderDetailDto = new OrderDetailDto();
+
+
+            List<CustomerOrder> allOrders = customerOrderRepository.findAllByOrderStatus(OrderStatus.REJECTED);
+            if (!CollectionUtils.isEmpty(allOrders)) {
+
+
+                allOrders.forEach(customerOrder -> {
+                    CustomerOrderWrapperDto customerOrderWrapperDto = new CustomerOrderWrapperDto();
+                    List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+
+                    CustomerOrder orderDetail = customerOrder;
+                    customerOrderWrapperDto.setOderId(orderDetail.getOderId());
+                    customerOrderWrapperDto.setUsername(orderDetail.getCustomer().getName());
+                    customerOrderWrapperDto.setTotalCost(orderDetail.getTotalCost());
+                    customerOrderWrapperDto.setOrderStatus(orderDetail.getOrderStatus());
+                    customerOrderWrapperDto.setProductCount(orderDetail.getOrderDetailSet().size());
+                    customerOrderWrapperDto.setCreatedDate(orderDetail.getCreatedDate());
+
+                    if (!CollectionUtils.isEmpty(orderDetail.getOrderDetailSet())) {
+                        orderDetail.getOrderDetailSet().forEach(o -> {
+                            orderDetailDtoList.add(o.toDto());
+                        });
+                        customerOrderWrapperDto.setOrderDetailDtoList(orderDetailDtoList.stream().sorted(Comparator.comparing(OrderDetailDto::getCreatedDate)).toList());
+                    }
+                    orderWrapperDtoList.add(customerOrderWrapperDto);
+                });
+
+                return orderWrapperDtoList.stream().sorted(Comparator.comparing(CustomerOrderWrapperDto::getCreatedDate).reversed()).toList();
+            } else {
+                return orderWrapperDtoList;
+            }
+
+
+        } catch (Exception e) {
+            log.error("getAllRejectedOrders failed : " + e.getMessage());
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }

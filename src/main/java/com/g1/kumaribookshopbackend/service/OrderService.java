@@ -15,6 +15,7 @@ public interface OrderService {
     List<CustomerOrderWrapperDto> getAllCustomerSubmittedOrders();
     List<CustomerOrderWrapperDto> getAllConfirmedOrders();
     List<CustomerOrderWrapperDto> getAllPaidOrders();
+    List<CustomerOrderWrapperDto> getAllRejectedOrders();
     Boolean confirmCustomerOrder(Long orderId);
     Boolean rejectCustomerOrder(Long orderId);
     Boolean closeCustomerOrder(Long orderId);
