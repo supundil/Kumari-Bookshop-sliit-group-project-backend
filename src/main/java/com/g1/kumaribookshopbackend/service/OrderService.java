@@ -3,6 +3,7 @@ package com.g1.kumaribookshopbackend.service;
 import com.g1.kumaribookshopbackend.dto.CustomerOrderDto;
 import com.g1.kumaribookshopbackend.dto.CustomerOrderWrapperDto;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface OrderService {
@@ -19,4 +20,5 @@ public interface OrderService {
     Boolean confirmCustomerOrder(Long orderId);
     Boolean rejectCustomerOrder(Long orderId);
     Boolean closeCustomerOrder(Long orderId);
+    ByteArrayInputStream getBill(String orderId);
 }

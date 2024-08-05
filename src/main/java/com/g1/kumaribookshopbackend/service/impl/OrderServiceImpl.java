@@ -1,5 +1,6 @@
 package com.g1.kumaribookshopbackend.service.impl;
 
+import com.g1.kumaribookshopbackend.dbConnection.DbConnection;
 import com.g1.kumaribookshopbackend.dto.CustomerOrderDto;
 import com.g1.kumaribookshopbackend.dto.CustomerOrderWrapperDto;
 import com.g1.kumaribookshopbackend.dto.OrderDetailDto;
@@ -19,11 +20,15 @@ import com.g1.kumaribookshopbackend.service.OrderService;
 import com.g1.kumaribookshopbackend.util.MessageConstant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -70,11 +75,7 @@ public class OrderServiceImpl implements OrderService {
                         orderDetailRepository.save(save);
                     }
                 } else {
-                    CustomerOrder customerOrder = CustomerOrder.builder()
-                            .customer(customer)
-                            .totalCost(BigDecimal.ZERO)
-                            .orderStatus(OrderStatus.PENDING)
-                            .build();
+                    CustomerOrder customerOrder = CustomerOrder.builder().customer(customer).totalCost(BigDecimal.ZERO).orderStatus(OrderStatus.PENDING).build();
                     CustomerOrder save = customerOrderRepository.save(customerOrder);
                     OrderDetail save1 = orderDetailRepository.save(getOrderDetail(product, save, customerOrderDto.getQuantity()));
                 }
@@ -273,6 +274,29 @@ public class OrderServiceImpl implements OrderService {
 
         } catch (Exception e) {
             log.error("getAllOrder failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public ByteArrayInputStream printBill(Long OrderId, String customerName, String total) {
+        try {
+            JasperDesign jasperDesign = JRXmlLoader.load("src/main/resources/Invoice.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("Parameter1", OrderId);
+            parameters.put("main_total", total);
+            parameters.put("cus_name", customerName);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, DbConnection.getInstance().getConnection());
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            JasperExportManager.exportReportToPdfStream(jasperPrint, byteArrayOutputStream);
+//          Uncomment and set path if you want to download from backend
+
+//          String pdfFilePath = "D:\\SLIIT\\projects\\group\\Invoice.pdf";
+//          JasperExportManager.exportReportToPdfFile(jasperPrint, pdfFilePath);
+            return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        } catch (Exception e) {
+            log.error("order bill generate failed : " + e.getMessage());
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
     }
@@ -536,6 +560,25 @@ public class OrderServiceImpl implements OrderService {
             log.error("getAllOrder failed : " + e.getMessage());
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public ByteArrayInputStream getBill(String username) {
+        BigDecimal total = new BigDecimal(0);
+        Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
+            throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+        });
+
+        Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PAID, customer);
+        if (order.isPresent()) {
+            for (OrderDetail orderDetail : order.get().getOrderDetailSet()) {
+                total.add(orderDetail.getProductTotalPrice());
+            }
+            return printBill(order.get().getOderId(), customer.getName(), order.get().getTotalCost().toString());
+        } else {
+            return null;
+        }
+
     }
 
     private OrderDetail getOrderDetail(Product product, CustomerOrder customerOrder, Integer quantity) {

@@ -2,13 +2,15 @@ package com.g1.kumaribookshopbackend.controller;
 
 import com.g1.kumaribookshopbackend.dto.CustomerOrderDto;
 import com.g1.kumaribookshopbackend.dto.CustomerOrderWrapperDto;
-import com.g1.kumaribookshopbackend.dto.RequestDto;
 import com.g1.kumaribookshopbackend.service.OrderService;
 import lombok.AllArgsConstructor;
+import net.sf.jasperreports.repo.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @AllArgsConstructor
@@ -83,6 +85,25 @@ public class OrderController {
     @PostMapping("/paid-customer-order/{orderId}")
     public ResponseEntity<Boolean> paidCustomerOrder(@PathVariable Long orderId) {
         return new ResponseEntity<>(orderService.closeCustomerOrder(orderId), HttpStatus.OK);
+    }
+    @PostMapping("/get-bill/{username}")
+    public ResponseEntity<byte[]> getBill(@PathVariable String username) {
+
+        try {
+
+            ByteArrayInputStream pdfStream = orderService.getBill(username);
+            if(null == pdfStream) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=Invoice_" + username + ".pdf");
+            InputStreamResource resource = new InputStreamResource();
+            resource.setInputStream(pdfStream);
+            return new ResponseEntity<>(pdfStream.readAllBytes(), headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

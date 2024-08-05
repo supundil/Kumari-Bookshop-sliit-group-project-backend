@@ -72,6 +72,12 @@
             <version>3.2.3</version>
             <scope>test</scope>
         </dependency>
+            <!-- JasperReports Core -->
+            <dependency>
+                <groupId>net.sf.jasperreports</groupId>
+                <artifactId>jasperreports</artifactId>
+                <version>6.20.0</version> <!-- Use the latest version -->
+            </dependency>
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
