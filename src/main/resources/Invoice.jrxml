@@ -65,7 +65,7 @@
 		<![CDATA[SELECT
 	order_detail.oder_detail_id,
 	product.name,
-	product.description,
+	product.selling_price,
 	order_detail.product_qnt,
 	order_detail.product_total_price
 FROM order_detail
@@ -82,9 +82,9 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 		<property name="com.jaspersoft.studio.field.label" value="name"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="product"/>
 	</field>
-	<field name="description" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="description"/>
-		<property name="com.jaspersoft.studio.field.label" value="description"/>
+	<field name="selling_price" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="selling_price"/>
+		<property name="com.jaspersoft.studio.field.label" value="selling_price"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="product"/>
 	</field>
 	<field name="product_qnt" class="java.lang.Integer">
@@ -175,7 +175,7 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="16"/>
 				</textElement>
-				<text><![CDATA[TOTAL = ]]></text>
+				<text><![CDATA[TOTAL AMOUNT = ]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="444" y="84" width="100" height="30" uuid="f7faaa9b-a317-49ba-b54a-9830f2ad028e"/>
@@ -204,7 +204,7 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Description]]></text>
+				<text><![CDATA[Price]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" positionType="Float" x="300" y="0" width="111" height="20" forecolor="#000000" uuid="fc9d9175-11fa-4bee-8c35-e7d448022c3e">
@@ -222,7 +222,7 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Price]]></text>
+				<text><![CDATA[Total]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -233,7 +233,7 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="31bfb321-ef4f-44e3-bb51-e1f8f471d23c"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="12" isBold="false"/>
+					<font fontName="Arial" size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
@@ -244,7 +244,7 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="12" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{selling_price}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" positionType="Float" x="300" y="0" width="111" height="20" uuid="48bacd63-b76a-481f-a806-844c17488da3">
@@ -267,14 +267,10 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 	<lastPageFooter>
 		<band height="177">
 			<staticText>
-				<reportElement positionType="Float" x="0" y="0" width="261" height="110" uuid="1a0d7088-5af7-4865-8be1-41ec5f51fb36"/>
-				<box>
-					<topPen lineWidth="1.1" lineStyle="Dashed"/>
-					<leftPen lineWidth="1.1" lineStyle="Dashed"/>
-					<bottomPen lineWidth="1.1" lineStyle="Dashed"/>
-					<rightPen lineWidth="1.1" lineStyle="Dashed"/>
-				</box>
-				<text><![CDATA[Your notes here]]></text>
+				<reportElement positionType="Float" x="0" y="0" width="550" height="110"  uuid="1a0d7088-5af7-4865-8be1-41ec5f51fb36"/>
+				<text ><![CDATA[We hope you are happy with your purches However, if you find any malfunction or faults with your purchased product, you may return it to us for an exchange within 14 days.
+
+You must provide order bill when returning.]]></text>
 			</staticText>
 			<staticText>
 				<reportElement positionType="Float" mode="Opaque" x="0" y="120" width="556" height="30" backcolor="#E6E8E9" uuid="36aa233d-4305-48e6-974a-1bbf89bb3c8f"/>

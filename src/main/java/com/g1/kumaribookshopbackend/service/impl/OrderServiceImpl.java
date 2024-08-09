@@ -569,12 +569,12 @@ public class OrderServiceImpl implements OrderService {
             throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
         });
 
-        Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.PAID, customer);
+        Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.CONFIRMED, customer);
         if (order.isPresent()) {
             for (OrderDetail orderDetail : order.get().getOrderDetailSet()) {
-                total.add(orderDetail.getProductTotalPrice());
+                total = total.add(orderDetail.getProductTotalPrice());
             }
-            return printBill(order.get().getOderId(), customer.getName(), order.get().getTotalCost().toString());
+            return printBill(order.get().getOderId(), customer.getName(), total.toString());
         } else {
             return null;
         }
