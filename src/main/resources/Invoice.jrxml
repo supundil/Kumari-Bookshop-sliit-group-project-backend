@@ -129,7 +129,7 @@ WHERE order_detail.order_id = $P{Parameter1}]]>
 			</textField>
 			<image hAlign="Center">
 				<reportElement x="0" y="0" width="65" height="60" uuid="94883631-a913-43e2-b182-ab8d77d0181e"/>
-				<imageExpression><![CDATA["C:/Users/LTP-121/Desktop/Screenshot 2024-08-03 114343.png"]]></imageExpression>
+				<imageExpression><![CDATA["src/main/resources/assets/logo2.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="415" y="30" width="50" height="20" uuid="0b3f9342-da78-4cfa-9fc5-2301c4749678"/>
