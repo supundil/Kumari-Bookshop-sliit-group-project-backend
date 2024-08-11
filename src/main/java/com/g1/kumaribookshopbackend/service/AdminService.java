@@ -9,5 +9,7 @@ public interface AdminService {
 
     RequestDto saveAdmin(AdminDto adminDto);
 
+    Boolean updateAdminDetails(AdminDto adminDto);
+
     List<AdminDto> getAllAdmins();
 }

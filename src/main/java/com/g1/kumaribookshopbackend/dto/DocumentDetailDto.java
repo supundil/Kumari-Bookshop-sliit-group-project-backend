@@ -15,7 +15,8 @@ public class DocumentDetailDto extends SuperDto<DocumentDetail> {
         DocumentDetail documentDetail = new DocumentDetail();
         documentDetail.setDocumentId(this.documentId);
         documentDetail.setFileId(this.fileId);
-        documentDetail.setFileName(this.getFileName());
+        documentDetail.setFileName(this.fileName);
+        documentDetail.setImage(this.fileBase64);
         return documentDetail;
     }
 }

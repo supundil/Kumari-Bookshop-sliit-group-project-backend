@@ -9,19 +9,20 @@ import com.g1.kumaribookshopbackend.exception.InternalServerException;
 import com.g1.kumaribookshopbackend.repository.AdminRepository;
 import com.g1.kumaribookshopbackend.service.AdminService;
 import com.g1.kumaribookshopbackend.util.MessageConstant;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class AdminServiceImpl extends UtilService implements AdminService {
 
-    @Autowired
     private AdminRepository adminRepository;
 
     @Override
@@ -55,6 +56,37 @@ public class AdminServiceImpl extends UtilService implements AdminService {
             throw new AlreadyExistException(e.getMessage());
         } catch (Exception e) {
             log.error("Save admin failed : " + e.getMessage());
+            throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR) ;
+        }
+    }
+
+    @Override
+    public Boolean updateAdminDetails(AdminDto adminDto) {
+        try {
+
+            if (Objects.nonNull(adminDto)) {
+
+                Optional<Admin> admin1 = adminRepository.findById(adminDto.getAdminId());
+                if (admin1.isPresent()) {
+                    Admin admin = adminDto.toEntity();
+                    admin.setAdminId(admin1.get().getAdminId());
+                    admin.setPassword(hidePassword(admin.getPassword()));
+                    adminRepository.save(admin);
+                    return true;
+                } else {
+                    throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
+                }
+
+            } else {
+                throw new BadRequestException(MessageConstant.BAS_REQUEST);
+            }
+
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (AlreadyExistException e) {
+            throw new AlreadyExistException(e.getMessage());
+        } catch (Exception e) {
+            log.error("updateAdminDetails failed : " + e.getMessage());
             throw new InternalServerException(MessageConstant.INTERNAL_SERVER_ERROR) ;
         }
     }

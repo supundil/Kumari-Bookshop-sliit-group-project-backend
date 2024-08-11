@@ -38,4 +38,10 @@ public class AdminController {
             AdminDto adminDto = new ObjectMapper().readValue(adminDtoString, AdminDto.class);
             return new ResponseEntity<>(adminService.saveAdmin(adminDto), HttpStatus.OK);
     }
+
+    @PostMapping("/update-admin")
+    public ResponseEntity<Boolean> updateAdminDetails(@RequestParam("adminDto") String adminDtoString) throws JsonProcessingException {
+        AdminDto adminDto = new ObjectMapper().readValue(adminDtoString, AdminDto.class);
+        return new ResponseEntity<>(adminService.updateAdminDetails(adminDto), HttpStatus.OK);
+    }
 }

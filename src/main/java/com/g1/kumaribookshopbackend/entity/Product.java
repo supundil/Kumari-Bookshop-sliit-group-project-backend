@@ -24,7 +24,7 @@ public class Product extends SuperEntity<ProductDto> {
     private String code;
     @Column
     private String name;
-    @Column
+    @Column(length = 2048)
     private String description;
     @Column
     private BigDecimal buyingPrice;

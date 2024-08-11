@@ -5,6 +5,7 @@ import com.g1.kumaribookshopbackend.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +24,8 @@ public class CustomerOrder extends SuperEntity {
     private LocalDateTime oderPlacedDate;
     @Column
     private LocalDateTime oderVerifiedDate;
+    @Column
+    private BigDecimal totalCost;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PENDING;
 
