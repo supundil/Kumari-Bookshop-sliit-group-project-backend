@@ -66,7 +66,7 @@ public class AdminServiceImpl extends UtilService implements AdminService {
 
             if (Objects.nonNull(adminDto)) {
 
-                Optional<Admin> admin1 = adminRepository.findByUserName(adminDto.getUserName());
+                Optional<Admin> admin1 = adminRepository.findById(adminDto.getAdminId());
                 if (admin1.isPresent()) {
                     Admin admin = adminDto.toEntity();
                     admin.setAdminId(admin1.get().getAdminId());
