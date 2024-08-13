@@ -492,7 +492,15 @@ public class OrderServiceImpl implements OrderService {
 
                     CustomerOrder order = customerOrder.get();
                     order.setOrderStatus(OrderStatus.CONFIRMED);
-                    customerOrderRepository.save(order);
+                    CustomerOrder save = customerOrderRepository.save(order);
+
+                    save.getOrderDetailSet().forEach(orderDetail -> {
+                        OrderDetail detail = orderDetail;
+                        Product product = orderDetail.getProduct();
+                        product.setQuantity(product.getQuantity() - orderDetail.getProductQnt());
+                        productRepository.save(product);
+                    });
+
                     return true;
                 } else {
                     throw new NotFoundException(MessageConstant.ORDER_DETAIL_NOT_FOUND);
