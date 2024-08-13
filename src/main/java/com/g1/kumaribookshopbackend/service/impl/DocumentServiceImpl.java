@@ -47,6 +47,7 @@ public class DocumentServiceImpl implements DocumentService {
 
                 documentDetail.setFileId(updateFile.getFileId());
                 documentDetail.setFileName(updateFile.getFileName());
+                documentDetail.setImage(updateFile.getFileBase64());
                 documentDetailRepository.save(documentDetail);
                 return documentDetail.toDto();
             } else {

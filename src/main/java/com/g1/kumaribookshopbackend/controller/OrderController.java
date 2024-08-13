@@ -86,17 +86,17 @@ public class OrderController {
     public ResponseEntity<Boolean> paidCustomerOrder(@PathVariable Long orderId) {
         return new ResponseEntity<>(orderService.closeCustomerOrder(orderId), HttpStatus.OK);
     }
-    @PostMapping("/get-bill/{username}")
-    public ResponseEntity<byte[]> getBill(@PathVariable String username) {
+    @PostMapping("/get-bill/{orderId}")
+    public ResponseEntity<byte[]> getBill(@PathVariable Long orderId) {
 
         try {
 
-            ByteArrayInputStream pdfStream = orderService.getBill(username);
+            ByteArrayInputStream pdfStream = orderService.getBill(orderId);
             if(null == pdfStream) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=Invoice_" + username + ".pdf");
+            headers.add("Content-Disposition", "attachment; filename=Invoice_" + orderId + ".pdf");
             InputStreamResource resource = new InputStreamResource();
             resource.setInputStream(pdfStream);
             return new ResponseEntity<>(pdfStream.readAllBytes(), headers, HttpStatus.OK);

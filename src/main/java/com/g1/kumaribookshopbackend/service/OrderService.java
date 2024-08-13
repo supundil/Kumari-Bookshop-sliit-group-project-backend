@@ -20,5 +20,5 @@ public interface OrderService {
     Boolean confirmCustomerOrder(Long orderId);
     Boolean rejectCustomerOrder(Long orderId);
     Boolean closeCustomerOrder(Long orderId);
-    ByteArrayInputStream getBill(String orderId);
+    ByteArrayInputStream getBill(Long orderId);
 }

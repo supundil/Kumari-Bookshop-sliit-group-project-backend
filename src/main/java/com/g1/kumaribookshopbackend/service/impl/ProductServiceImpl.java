@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
 
                     DocumentDetail documentDetail = product.get().getDocumentDetail();
                     if (Objects.nonNull(file)) {
-                        DocumentDetailDto documentDetailDto = documentService.updateImage(file, product.get().getProductId());
+                        DocumentDetailDto documentDetailDto = documentService.updateImage(file, product.get().getDocumentDetail().getDocumentId());
                         documentDetail = documentDetailDto.toEntity();
                     }
 

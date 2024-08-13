@@ -571,18 +571,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ByteArrayInputStream getBill(String username) {
+    public ByteArrayInputStream getBill(Long orderId) {
         BigDecimal total = new BigDecimal(0);
-        Customer customer = customerRepository.findByUserName(username).orElseThrow(() -> {
-            throw new InternalServerException(MessageConstant.USER_NOT_FOUND);
-        });
 
-        Optional<CustomerOrder> order = customerOrderRepository.findFirstByOrderStatusAndCustomer(OrderStatus.CONFIRMED, customer);
+        Optional<CustomerOrder> order = customerOrderRepository.findById(orderId);
         if (order.isPresent()) {
             for (OrderDetail orderDetail : order.get().getOrderDetailSet()) {
                 total = total.add(orderDetail.getProductTotalPrice());
             }
-            return printBill(order.get().getOderId(), customer.getName(), total.toString());
+            return printBill(order.get().getOderId(), order.get().getCustomer().getName(), order.get().getTotalCost().toString());
         } else {
             return null;
         }
